@@ -138,23 +138,39 @@ cat > "$STAGE/usr/bin/quick-browser" <<'WRAP'
 #!/bin/sh
 # Quick Browser launcher
 export CHROME_DEVEL_SANDBOX=/opt/quick-browser/chrome-sandbox
-exec /opt/quick-browser/chrome "$@"
+# --class: Chromium names its windows after the binary ('chrome'), which is
+# not what quick-browser.desktop declares, so Plasma could not bind window to
+# entry — launcher icon right, taskbar/pinned icon wrong (field defect F).
+# Forcing the class is better than chasing it: the declaration stays readable
+# and the window matches it. Must equal StartupWMClass in the desktop file.
+exec /opt/quick-browser/chrome --class=quick-browser "$@"
 WRAP
 chmod 0755 "$STAGE/usr/bin/quick-browser"
 
 install -m 0644 "$REPO/applications/quick-browser.desktop" \
         "$STAGE/usr/share/applications/quick-browser.desktop"
 
-# icons: the full hicolor ladder, so the shell picks the right one per context
+# icons: the full hicolor ladder, so the shell picks the right one per context.
+# Both names — the desktop entry uses the themed quickopen-* name, which the OS
+# build used to sed in after install, so a package upgrade reverted it. Ship
+# the alias here and the icon resolves on Quick OS and stock Ubuntu alike.
 for size in 16 24 32 48 64 128 256 512; do
   src="$REPO/branding/quick-browser-$size.png"
   [ -f "$src" ] || continue
   d="$STAGE/usr/share/icons/hicolor/${size}x${size}/apps"
   mkdir -p "$d"
   install -m 0644 "$src" "$d/quick-browser.png"
+  install -m 0644 "$src" "$d/quickopen-quick-browser.png"
 done
-[ -f "$REPO/quick-browser.svg" ] && install -m 0644 "$REPO/quick-browser.svg" \
-    "$STAGE/usr/share/icons/hicolor/scalable/apps/quick-browser.svg"
+if [ -f "$REPO/quick-browser.svg" ]; then
+  # a scalable SVG is mandatory: with only Fixed-size raster dirs the icon is
+  # unresolvable at any size the theme does not declare — which is every
+  # custom panel height and HiDPI scale (field defect H).
+  for n in quick-browser quickopen-quick-browser; do
+    install -m 0644 "$REPO/quick-browser.svg" \
+      "$STAGE/usr/share/icons/hicolor/scalable/apps/$n.svg"
+  done
+fi
 
 # ---------------------------------------------------------------- the licences
 # BSD-3-Clause obliges us to carry the copyright notice and the third-party

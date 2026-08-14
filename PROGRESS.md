@@ -15,9 +15,11 @@ reboot / disk change. Nothing here depends on a running session.
 | 108 ungoogled patches applied | **done** |
 | Branding applied to the tree | **done** — 729 renames, icons, BRANDING |
 | `gn gen` | **done** — free codecs only, official build |
-| `ninja chrome` | **IN PROGRESS** — reached ~4,400 / 43,036 targets, **0 failures** |
-| deb / .usi / apt packaging | not started |
-| Screenshots + portal listing | not started |
+| `ninja chrome` | **done** — 2026-08-14, 0 failures, ~4h; binary stripped 510→316 MB |
+| deb / .usi / apt packaging | **done** — rev-2 deb (125 MB), signed .usi, live on r2.quickopen.io |
+| Screenshots + portal listing | **done** — 6 shots (3 scenes × 2 themes), published on quickopen.ai |
+| Verified on stock noble + Quick OS VM | **done** — apt install end-to-end, SUID sandbox intact |
+| Windows .exe installer | **queued** — needs a Windows Chromium build host (MSVC); platforms stays ["linux"] until the 2-4-week security-rebuild cadence is provable there |
 
 The build workspace is `../../browser/` (NOT in git). If the disk holding it is
 replaced, everything under it is rebuildable from this repo — see below.
