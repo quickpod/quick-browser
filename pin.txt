@@ -1,0 +1,7 @@
+# The exact sources Quick Browser is built from.
+# Both lines move together: an ungoogled-chromium tag targets ONE Chromium
+# release, and mixing them means patches that do not apply.
+chromium_upstream=https://chromium.googlesource.com/chromium/src.git
+chromium_tag=151.0.7922.137
+ungoogled_upstream=https://github.com/ungoogled-software/ungoogled-chromium.git
+ungoogled_tag=151.0.7922.137-1

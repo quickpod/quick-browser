@@ -1,0 +1,93 @@
+Quick Browser
+Copyright (c) 2026 QuickOpen (quickopen.ai)
+
+This product is built from the Chromium open-source project, with the
+ungoogled-chromium patch set applied. It is not Google Chrome, it is not
+Chromium, and it is neither produced nor endorsed by Google. No association
+with Google is claimed or implied.
+
+"Google", "Chrome" and "Chromium" are trademarks of Google LLC. They appear
+here only to state, factually, what this software is built from -- never as
+the identity of this product, and never to endorse or promote it. Google's
+BSD-3-Clause licence is explicit that its name may not be used for that
+purpose, and it is not.
+
+--------------------------------------------------------------------------
+LICENCES
+--------------------------------------------------------------------------
+
+Chromium is distributed under the 3-clause BSD licence:
+
+    Copyright 2015 The Chromium Authors
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+       * Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+       * Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+       * Neither the name of Google LLC nor the names of its contributors
+    may be used to endorse or promote products derived from this software
+    without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+    A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+    OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+    SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+    LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+    DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+The ungoogled-chromium patch set is also BSD-3-Clause; its licence ships
+beside this file as licenses/ungoogled-chromium-BSD-3.txt .
+
+Components authored by QuickOpen -- the branding, the Aura theme, the
+packaging and the build tooling -- are licensed under the Apache License v2.0
+(licenses/Apache-2.0.txt).
+
+--------------------------------------------------------------------------
+THIRD-PARTY COMPONENTS
+--------------------------------------------------------------------------
+
+Chromium bundles several hundred third-party components under their own
+licences. The complete, per-component inventory is generated from the source
+tree at build time and is available INSIDE THE BROWSER at:
+
+    about:credits
+
+That page is how the BSD-3-Clause notice requirement is met for binary
+distribution, so it is never removed, never disabled, and is linked from the
+About dialog.
+
+--------------------------------------------------------------------------
+WHAT THIS BUILD DOES NOT DO
+--------------------------------------------------------------------------
+
+The ungoogled-chromium patches remove Chromium's integration with Google
+services: no Safe Browsing callbacks, no component updater, no field trials,
+no usage or crash reporting, and no Google API keys. Nothing contacts a
+QuickOpen server either. The browser makes network connections when you ask it
+to load a page, and otherwise stays quiet.
+
+This build ships FREE CODECS ONLY -- VP8, VP9, AV1 and Opus. H.264 and AAC are
+deliberately absent: the code is open but the formats are patent-encumbered,
+and QuickOpen holds no patent licence for them. Some video on the web will not
+play as a result. That is a considered trade, not an oversight.
+
+--------------------------------------------------------------------------
+SOURCE
+--------------------------------------------------------------------------
+
+    https://github.com/quickpod/quick-browser
+
+BSD-3-Clause does not require us to publish our modifications. We publish them
+anyway, along with the exact upstream revisions each release is built from
+(see pin.txt), because a browser that asks to be trusted with your web traffic
+should be inspectable.

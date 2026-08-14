@@ -1,0 +1,20 @@
+{
+  "slug": "quick-browser",
+  "name": "Quick Browser",
+  "tagline": "A fast web browser with the Google removed — no account, no telemetry, no Safe Browsing callbacks, and nothing phoning home.",
+  "categorySlug": "internet",
+  "license": "Apache-2.0",
+  "description": "Quick Browser is a full-featured web browser built from the Chromium open-source project with the ungoogled-chromium patch set applied. It renders the modern web exactly as Chromium does — same engine, same standards support, same extension format — but the parts that talk to Google are gone rather than merely switched off: no API keys, no Safe Browsing callbacks, no component updater, no field trials, no usage or crash reporting. It does not report to QuickOpen either. The browser makes network connections when you ask it to load a page, and otherwise stays quiet. Ships free codecs only (VP8, VP9, AV1, Opus); H.264 and AAC are deliberately absent because those formats are patent-encumbered, so some web video will not play.",
+  "aiStack": "C++ (Chromium engine, BSD-3-Clause), ungoogled-chromium patches, GN/Ninja build",
+  "platforms": [
+    "linux"
+  ],
+  "buildEntry": "bin/quick-browser",
+  "engine": {
+    "repo": "quickpod/quick-browser",
+    "basedOn": "Chromium",
+    "engineLicense": "BSD-3-Clause",
+    "note": "Built from the Chromium open-source project. Not Google Chrome, not Chromium, and neither produced nor endorsed by Google."
+  },
+  "platformNotes": "Linux first. Windows and macOS are not offered yet: a browser is a standing security commitment — Chromium ships fixes for actively exploited bugs every two to four weeks — and we will not publish a platform we cannot rebuild and re-ship that fast. macOS additionally needs a Mac with Xcode, which we do not have."
+}

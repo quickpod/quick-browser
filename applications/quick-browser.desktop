@@ -1,0 +1,23 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Quick Browser
+GenericName=Web Browser
+Comment=Browse the web. No Google account, no telemetry, no Safe Browsing callbacks.
+Exec=quick-browser %U
+Icon=quick-browser
+Terminal=false
+Categories=Network;WebBrowser;
+Keywords=web;browser;internet;www;chromium;privacy;
+StartupNotify=true
+StartupWMClass=quick-browser
+MimeType=text/html;text/xml;application/xhtml+xml;application/xml;application/rss+xml;application/rdf+xml;image/gif;image/jpeg;image/png;image/webp;x-scheme-handler/http;x-scheme-handler/https;
+Actions=new-window;new-private-window;
+
+[Desktop Action new-window]
+Name=New Window
+Exec=quick-browser
+
+[Desktop Action new-private-window]
+Name=New Incognito Window
+Exec=quick-browser --incognito
