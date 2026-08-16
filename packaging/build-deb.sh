@@ -172,6 +172,14 @@ if [ -f "$REPO/quick-browser.svg" ]; then
   done
 fi
 
+# ------------------------------------------------------ bundled extensions
+# SecureVault Autofill ships PRE-INSTALLED: unpacked copy + packed .crx under
+# /opt/quick-browser/quickopen-extensions/ and a Chromium external-extensions
+# JSON in /usr/share/chromium/extensions/ (the persistent mechanism the
+# shipped binary consults — see stage-securevault-extension.sh for the full
+# reasoning). Pairing still requires the SecureVault app, open and unlocked.
+"$HERE/stage-securevault-extension.sh" "$STAGE"
+
 # ---------------------------------------------------------------- the licences
 # BSD-3-Clause obliges us to carry the copyright notice and the third-party
 # inventory. about:credits inside the binary is the primary discharge of that;
