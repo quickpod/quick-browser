@@ -12,3 +12,15 @@
 tag=151.0.7922.108-1.1
 url=https://github.com/ungoogled-software/ungoogled-chromium-windows/releases/download/151.0.7922.108-1.1/ungoogled-chromium_151.0.7922.108-1.1_windows_x64.zip
 sha256=734c87f3d2c07bde8f904ea02f57903a0a9c9ecf8edecd2f91b144b7805c3328
+
+# BRANDED PAYLOAD EXE (field defect fix): the Windows taskbar shows the
+# window icon, which comes from chrome.exe's OWN icon-resource group — so the
+# stock build showed the Chromium logo while running. chrome.exe's
+# IDR_MAINFRAME group is rebuilt from our .ico by icon-patch.ps1 (real
+# Windows only; rcedit and wine both corrupt the group directory) and the
+# result is Authenticode-signed with the QuickOpen Root CA. Upstream ships
+# chrome.exe UNSIGNED, so signing the modified exe is a strict improvement —
+# nothing that was signed became unsigned. All other payload files ship
+# byte-identical.
+winshell_url=https://nsis.sourceforge.io/mediawiki/images/5/54/WinShell.zip
+winshell_sha256=34e111f8aacf64c540d848fd06b9d6f3e2c10cb825ec9329a01d1141973e749b

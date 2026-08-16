@@ -15,11 +15,16 @@
 
 Unicode true
 !include "MUI2.nsh"
+; WinShell plug-in (pinned in windows-pin.txt): sets the AppUserModelID on the
+; shortcuts so taskbar pins/grouping bind to the running browser, which itself
+; runs under Chromium's base AUMID.
+!addplugindir "${PLUGINDIR}"
 
 !define APPNAME "Quick Browser"
 !define APPKEY  "QuickBrowser"
 !define PUBLISHER "QuickOpen"
 !define APPURL "https://quickopen.ai/projects/quick-browser"
+!define AUMID "Chromium"
 !define UNINSTKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPKEY}"
 
 Name "${APPNAME}"
@@ -66,6 +71,10 @@ Section "Quick Browser"
   ; shortcuts — Quick name + Quick icon
   CreateShortCut "$SMPROGRAMS\${APPNAME}.lnk" "$INSTDIR\chrome.exe" "" "$INSTDIR\quick-browser.ico" 0 SW_SHOWNORMAL "" "A fast web browser with the Google removed"
   CreateShortCut "$DESKTOP\${APPNAME}.lnk" "$INSTDIR\chrome.exe" "" "$INSTDIR\quick-browser.ico" 0
+  ; bind the shortcuts to the AUMID the running browser reports (Chromium's
+  ; base app id) so the taskbar groups them with our embedded window icon
+  WinShell::SetLnkAUMI "$SMPROGRAMS\${APPNAME}.lnk" "${AUMID}"
+  WinShell::SetLnkAUMI "$DESKTOP\${APPNAME}.lnk" "${AUMID}"
 
   ; uninstall entry
   WriteRegStr HKLM "${UNINSTKEY}" "DisplayName" "${APPNAME}"

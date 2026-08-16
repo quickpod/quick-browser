@@ -49,6 +49,29 @@ cp "$REPO"/licenses/* "$PAYLOAD/licenses/"
 ICO="$WORK/quick-browser.ico"
 convert "$ROOT/publish/icons/quick-browser.png" -define icon:auto-resize=256,128,64,48,32,16 "$ICO"
 
+# BRANDED chrome.exe (field defect: the taskbar shows the window icon, which
+# comes from the exe's OWN icon-resource group, not from shortcut .ico files).
+# icon-patch.ps1 rebuilds chrome.exe's IDR_MAINFRAME group from our .ico ON A
+# REAL WINDOWS BOX (wine's and rcedit's resource rewriting are both broken —
+# see the script header), and the result is Authenticode-signed with the
+# QuickOpen CA on the signing box. This build refuses to pack an unbranded
+# chrome.exe.
+OVERRIDE="$ROOT/winbuild/overrides/quick-browser/chrome.exe"
+[ -f "$OVERRIDE" ] || { echo "!! missing branded+signed chrome.exe at $OVERRIDE" >&2
+  echo "!! prepare it with packaging/windows/icon-patch.ps1 + osslsigncode (see installer.nsi header)" >&2; exit 1; }
+cp "$OVERRIDE" "$PAYLOAD/chrome.exe"
+echo "   branded chrome.exe: $(sha256sum "$PAYLOAD/chrome.exe" | cut -c1-16)..."
+
+# WinShell NSIS plug-in (shortcut AUMID), pinned in windows-pin.txt
+WINSHELL="$ROOT/winbuild/tools/WinShell/Plugins/x86-unicode"
+if [ ! -f "$WINSHELL/WinShell.dll" ]; then
+  mkdir -p "$ROOT/winbuild/tools" && cd "$ROOT/winbuild/tools"
+  curl -sL -o WinShell.zip "$(pin winshell_url)"
+  echo "$(pin winshell_sha256)  WinShell.zip" | sha256sum -c - >/dev/null || { echo "!! WinShell.zip sha mismatch" >&2; exit 1; }
+  unzip -o -q WinShell.zip -d WinShell
+  cd - >/dev/null
+fi
+
 EST_KB="$(du -sk "$PAYLOAD" | cut -f1)"
 LICENSEFILE="$PAYLOAD/LICENSE"; [ -f "$LICENSEFILE" ] || LICENSEFILE="$REPO/LICENSE"
 makensis -V2 \
@@ -57,6 +80,7 @@ makensis -V2 \
   -DDISPLAYVERSION="$DISPLAYVER" \
   -DESTSIZE_KB="$EST_KB" \
   -DICOFILE="$ICO" \
+  -DPLUGINDIR="$WINSHELL" \
   -DLICENSEFILE="$LICENSEFILE" \
   -DOUTFILE="$OUT/QuickBrowser-Setup.exe" \
   "$HERE/installer.nsi"
