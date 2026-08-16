@@ -143,7 +143,14 @@ export CHROME_DEVEL_SANDBOX=/opt/quick-browser/chrome-sandbox
 # entry — launcher icon right, taskbar/pinned icon wrong (field defect F).
 # Forcing the class is better than chasing it: the declaration stays readable
 # and the window matches it. Must equal StartupWMClass in the desktop file.
-exec /opt/quick-browser/chrome --class=quick-browser "$@"
+#
+# --no-first-run: the very first launch opened ungoogled-chromium's own
+# first-run tab — upstream name in the window title, page heading and a wiki
+# FAQ link (Quick OS 0.1.12 regression sweep, A3-P1b). That page is compiled
+# into the engine, so until a from-source branding pass replaces it, the
+# correct move is to never show it. The flag only skips first-run UI; it
+# changes no defaults and the sentinel is still written.
+exec /opt/quick-browser/chrome --class=quick-browser --no-first-run "$@"
 WRAP
 chmod 0755 "$STAGE/usr/bin/quick-browser"
 
