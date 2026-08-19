@@ -19,11 +19,12 @@
 // the extension's options entry. Fixing that properly needs the omnibox
 // itself, which is a browser-source change, not an extension.
 
-const RESOLUTION_FAILURES = new Set([
-  "net::ERR_NAME_NOT_RESOLVED",
-  "net::ERR_NAME_RESOLUTION_FAILED",
-  "net::ERR_ICANN_NAME_COLLISION",
-]);
+// ANY failure counts, not a curated list of DNS errors. Measured in the VM:
+// typing "hello" produces net::ERR_ABORTED, not ERR_NAME_NOT_RESOLVED —
+// Chromium abandons the navigation rather than reporting a resolver error, so
+// a listener that waited for DNS errors never fired and the user got the same
+// dead page as before. The single-label host test below is what makes this
+// safe: a real site has a dot, so "a bare word that failed" is a search.
 
 function looksLikeSearch(rawUrl) {
   let u;
@@ -46,7 +47,6 @@ function looksLikeSearch(rawUrl) {
 
 chrome.webNavigation.onErrorOccurred.addListener((details) => {
   if (details.frameId !== 0) return;              // main frame only
-  if (!RESOLUTION_FAILURES.has(details.error)) return;
   const query = looksLikeSearch(details.url);
   if (!query) return;                             // a genuinely dead address
   const target = chrome.runtime.getURL(
