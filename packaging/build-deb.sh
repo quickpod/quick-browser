@@ -187,6 +187,11 @@ fi
 # reasoning). Pairing still requires the SecureVault app, open and unlocked.
 "$HERE/stage-securevault-extension.sh" "$STAGE"
 
+# Quick Search Setup — the same mechanism, for the search provider this browser
+# deliberately does not ship. Without it, a typed word is a dead error page and
+# nothing says the silence was on purpose (owner field report 2026-08-19).
+"$HERE/stage-quicksearch-extension.sh" "$STAGE"
+
 # ---------------------------------------------------------------- the licences
 # BSD-3-Clause obliges us to carry the copyright notice and the third-party
 # inventory. about:credits inside the binary is the primary discharge of that;

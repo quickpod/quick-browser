@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Search is not connected</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f6f7f9; --card: #ffffff; --ink: #12161d; --ink-2: #46505f;
+    --muted: #6b7686; --line: #d8dce4; --accent: #3d6bf5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1017; --card: #151a24; --ink: #eef1f7; --ink-2: #c3cad6;
+      --muted: #8e99ab; --line: #2a3243; --accent: #7d9bf5;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; background: var(--bg); color: var(--ink);
+    font: 15px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    display: flex; align-items: center; justify-content: center; padding: 2rem;
+  }
+  main {
+    width: 100%; max-width: 40rem; background: var(--card);
+    border: 1px solid var(--line); border-radius: 10px; padding: 2rem;
+  }
+  h1 { margin: 0 0 .35rem; font-size: 1.35rem; letter-spacing: -.01em; }
+  .sub { margin: 0 0 1.5rem; color: var(--ink-2); }
+  .q {
+    display: block; margin: 0 0 1.5rem; padding: .7rem .9rem;
+    background: var(--bg); border: 1px solid var(--line); border-radius: 7px;
+    font-size: 1.05rem; word-break: break-word;
+  }
+  .q em { color: var(--muted); font-style: normal; font-size: .85rem;
+          display: block; margin-bottom: .15rem; }
+  h2 { font-size: .78rem; letter-spacing: .09em; text-transform: uppercase;
+       color: var(--muted); margin: 0 0 .6rem; }
+  .row { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.5rem; }
+  button {
+    font: inherit; cursor: pointer; border-radius: 7px; padding: .55rem 1rem;
+    border: 1px solid var(--line); background: var(--bg); color: var(--ink);
+  }
+  button:hover { border-color: var(--accent); }
+  button.primary { background: var(--accent); border-color: var(--accent);
+                   color: #fff; font-weight: 600; }
+  p.note { color: var(--ink-2); margin: 0 0 .8rem; }
+  .fine { color: var(--muted); font-size: .9rem; border-top: 1px solid var(--line);
+          padding-top: 1rem; margin: 1.5rem 0 0; }
+  code { background: var(--bg); border: 1px solid var(--line);
+         border-radius: 4px; padding: .05em .35em; font-size: .9em; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Search is not connected — on purpose</h1>
+  <p class="sub">Quick Browser ships without a search engine, so nothing you
+  type in the address bar is sent anywhere until you choose who should see it.
+  Nothing is broken.</p>
+
+  <div class="q" id="qbox" hidden><em>You typed</em><span id="q"></span></div>
+
+  <h2 id="pick-label">Search this once</h2>
+  <div class="row" id="providers"></div>
+
+  <h2>Or make it permanent</h2>
+  <p class="note">Pick a default search engine and the address bar works the
+  way you expect from then on.</p>
+  <div class="row">
+    <button class="primary" id="settings">Choose a default search engine…</button>
+  </div>
+
+  <p class="fine">Prefer a browser that searches out of the box? Install Chrome
+  or Edge from <strong>Install Popular Apps</strong>. Typing a full address —
+  <code>example.com</code> — always works here, with or without a search
+  engine.</p>
+</main>
+<script src="search.js"></script>
+</body>
+</html>
