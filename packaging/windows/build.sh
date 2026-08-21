@@ -15,6 +15,7 @@ ROOT="$(cd "$REPO/../.." && pwd)"
 DL="${1:-$ROOT/winbuild/downloads}"
 OUT="${2:-$ROOT/winbuild/dist}"
 WORK="$ROOT/winbuild/work/quick-browser"
+SYSCA="${QUICKOPEN_SYSCA:-/etc/ssl/certs/ca-certificates.crt}"  # public roots, to READ the EV signer
 
 pin(){ awk -F= -v k="$1" '$1==k{print $2}' "$HERE/windows-pin.txt" | tr -d ' \r'; }
 TAG="$(pin tag)"            # e.g. 151.0.7922.108-1.1
@@ -77,14 +78,59 @@ fi
 
 EST_KB="$(du -sk "$PAYLOAD" | cut -f1)"
 LICENSEFILE="$PAYLOAD/LICENSE"; [ -f "$LICENSEFILE" ] || LICENSEFILE="$REPO/LICENSE"
-makensis -V2 \
-  -DPAYLOAD="$PAYLOAD" \
-  -DVERSION="$VER" \
-  -DDISPLAYVERSION="$DISPLAYVER" \
-  -DESTSIZE_KB="$EST_KB" \
-  -DICOFILE="$ICO" \
-  -DPLUGINDIR="$WINSHELL" \
-  -DLICENSEFILE="$LICENSEFILE" \
+
+# THE SIGNED UNINSTALLER (see installer.nsi's two-pass note). NSIS can only
+# emit an uninstaller by RUNNING a built installer, so it cannot be produced
+# here — the generator stub has to execute on Windows. This script therefore
+# has two modes over ONE argument list, rather than a second copy of it that
+# would drift:
+#
+#   QUICKOPEN_UNINST_STUB_ONLY=1   compile the payload-free pass-1 stub and stop
+#   (default)                      the real installer, embedding the signed
+#                                  uninstaller produced from that stub
+#
+# Round trip, because makensis lives here and the ssh route to the signing box
+# lives on the dev box:
+#   proc$    QUICKOPEN_UNINST_STUB_ONLY=1 packaging/windows/build.sh
+#   dev$     publish/scripts/make-signed-uninstaller.sh --stub <stub> <out>
+#   dev$     publish/scripts/sign-windows-artifact.sh <out>
+#   proc$    packaging/windows/build.sh          # picks the signed one up below
+NSIARGS=(
+  -DPAYLOAD="$PAYLOAD"
+  -DVERSION="$VER"
+  -DDISPLAYVERSION="$DISPLAYVER"
+  -DESTSIZE_KB="$EST_KB"
+  -DICOFILE="$ICO"
+  -DPLUGINDIR="$WINSHELL"
+  -DLICENSEFILE="$LICENSEFILE"
+)
+
+if [ "${QUICKOPEN_UNINST_STUB_ONLY:-0}" = "1" ]; then
+  STUB="$ROOT/winbuild/uninstallers/quick-browser/stub.exe"
+  mkdir -p "$(dirname "$STUB")"
+  # -DUNINSTALLER must be defined even though pass 1 skips the branch using it:
+  # makensis resolves ${...} at parse time and an undefined symbol is an error.
+  makensis -V2 -DUNINSTALLER_ONLY -DUNINSTALLER=/dev/null \
+    "${NSIARGS[@]}" -DOUTFILE="$STUB" "$HERE/installer.nsi"
+  echo "   pass-1 stub: $STUB ($(du -h "$STUB" | cut -f1))"
+  echo "   next: run it on Windows, EV-sign the Uninstall.exe it writes, put it at"
+  echo "         $ROOT/winbuild/uninstallers/quick-browser/Uninstall.exe, re-run this script"
+  exit 0
+fi
+
+UNINST="$ROOT/winbuild/uninstallers/quick-browser/Uninstall.exe"
+[ -f "$UNINST" ] || { echo "!! missing signed uninstaller at $UNINST" >&2
+  echo "!! build it: QUICKOPEN_UNINST_STUB_ONLY=1 $0" >&2; exit 1; }
+# Same gate, same reason, same pipefail trap as the payload overrides: capture
+# osslsigncode's output and grep the capture, never pipe into grep -q.
+EVOUT="$(osslsigncode verify -in "$UNINST" -CAfile "$SYSCA" 2>&1 || true)"
+printf '%s' "$EVOUT" | grep -qi "CN=Dosvak LLC" || {
+  echo "!! uninstaller is NOT EV-signed — refusing to build" >&2
+  echo "!!   publish/scripts/sign-windows-artifact.sh $UNINST" >&2; exit 1; }
+echo "   uninstaller: $(sha256sum "$UNINST" | cut -c1-16)... (EV: CN=Dosvak LLC)"
+
+makensis -V2 "${NSIARGS[@]}" \
+  -DUNINSTALLER="$UNINST" \
   -DOUTFILE="$OUT/QuickBrowser-Setup.exe" \
   "$HERE/installer.nsi"
 
