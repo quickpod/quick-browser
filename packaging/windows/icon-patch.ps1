@@ -18,7 +18,10 @@
 # section; wine's implementation is not trustworthy for this).
 #
 # NOTE: rewriting a resource invalidates any Authenticode signature on the
-# file — re-sign afterwards (we re-sign with the QuickOpen Root CA).
+# file — re-sign afterwards. Since 2026-08-21 that is the Dosvak LLC EV
+# certificate on the sansan token (publish/scripts/sign-windows-artifact.sh),
+# not the QuickOpen Root CA: Windows does not trust our own root, so a
+# self-signed payload was indistinguishable from unsigned to SmartScreen.
 param(
   [Parameter(Mandatory=$true)][string]$Exe,
   [Parameter(Mandatory=$true)][string]$Ico,

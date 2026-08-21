@@ -18,9 +18,15 @@ sha256=734c87f3d2c07bde8f904ea02f57903a0a9c9ecf8edecd2f91b144b7805c3328
 # stock build showed the Chromium logo while running. chrome.exe's
 # IDR_MAINFRAME group is rebuilt from our .ico by icon-patch.ps1 (real
 # Windows only; rcedit and wine both corrupt the group directory) and the
-# result is Authenticode-signed with the QuickOpen Root CA. Upstream ships
+# result is Authenticode-signed with the Dosvak LLC EV certificate (Sectigo
+# Public Code Signing CA EV R36) and RFC3161-timestamped. Upstream ships
 # chrome.exe UNSIGNED, so signing the modified exe is a strict improvement —
 # nothing that was signed became unsigned. All other payload files ship
 # byte-identical.
+#
+# It was the QuickOpen Root CA until 2026-08-21. That is our own root, which
+# no Windows machine trusts, so the signature bought nothing with SmartScreen;
+# packaging/windows/build.sh now REFUSES to pack a payload that is not signed
+# by CN=Dosvak LLC.
 winshell_url=https://nsis.sourceforge.io/mediawiki/images/5/54/WinShell.zip
 winshell_sha256=34e111f8aacf64c540d848fd06b9d6f3e2c10cb825ec9329a01d1141973e749b
