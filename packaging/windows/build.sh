@@ -49,36 +49,21 @@ cp "$REPO"/licenses/* "$PAYLOAD/licenses/"
 ICO="$WORK/quick-browser.ico"
 convert "$ROOT/publish/icons/quick-browser.png" -define icon:auto-resize=256,128,64,48,32,16 "$ICO"
 
-# BRANDED chrome.exe (field defect: the taskbar shows the window icon, which
-# comes from the exe's OWN icon-resource group, not from shortcut .ico files).
-# icon-patch.ps1 rebuilds chrome.exe's IDR_MAINFRAME group from our .ico ON A
-# REAL WINDOWS BOX (wine's and rcedit's resource rewriting are both broken —
-# see the script header), and the result is EV-signed on the sansan token.
-# This build refuses to pack an unbranded chrome.exe.
-OVERRIDE="$ROOT/winbuild/overrides/quick-browser/chrome.exe"
-[ -f "$OVERRIDE" ] || { echo "!! missing branded+signed chrome.exe at $OVERRIDE" >&2
-  echo "!! prepare it with packaging/windows/icon-patch.ps1, then EV-sign it:" >&2
-  echo "!!   publish/scripts/sign-windows-artifact.sh $OVERRIDE" >&2; exit 1; }
-
-# GATE: the payload must be EV-signed, not merely present. Until 2026-08-21
-# this override carried a QuickOpen Root CA signature — our own root, which
-# Windows does not trust — so the shipped chrome.exe was, to SmartScreen,
-# indistinguishable from unsigned. The check has to look at the bytes: nothing
-# about the filename changes when the signature does.
+# SIGNED PAYLOAD BINARIES. Two separate reasons a payload file needs replacing:
 #
-# CAPTURE, THEN GREP. `osslsigncode verify` exits non-zero on this box even for
-# a good EV signature (it cannot chain the Sectigo timestamp), so under
-# `set -o pipefail` a `... | grep -q` pipeline is ALWAYS false and would reject
-# every correctly-signed payload. -CAfile is required too: without it the
-# output never names the signer.
-SYSCA="${QUICKOPEN_SYSCA:-/etc/ssl/certs/ca-certificates.crt}"
-EVOUT="$(osslsigncode verify -in "$OVERRIDE" -CAfile "$SYSCA" 2>&1 || true)"
-printf '%s' "$EVOUT" | grep -qi "CN=Dosvak LLC" || {
-  echo "!! chrome.exe override is NOT EV-signed — refusing to build" >&2
-  echo "!!   publish/scripts/sign-windows-artifact.sh $OVERRIDE" >&2; exit 1; }
-
-cp "$OVERRIDE" "$PAYLOAD/chrome.exe"
-echo "   branded chrome.exe: $(sha256sum "$PAYLOAD/chrome.exe" | cut -c1-16)... (EV: CN=Dosvak LLC)"
+#   chrome.exe is MODIFIED — icon-patch.ps1 rebuilds its IDR_MAINFRAME group on
+#   a real Windows box so the taskbar shows our icon (wine and rcedit both
+#   corrupt the group directory), which invalidates any signature it had.
+#
+#   The other five (chrome_proxy, chrome_pwa_launcher, elevated_tracing_service,
+#   elevation_service, notification_helper) are UNMODIFIED but ship UNSIGNED:
+#   ungoogled-chromium signs nothing. Wrapping them in an EV-signed installer
+#   does not make them signed — once on disk they are judged on their own bytes.
+#
+# Both cases are handled the same way now: an override TREE mirroring the
+# payload layout, applied and then GATED, so a future upstream release that
+# adds a binary fails the build instead of shipping unsigned.
+"$ROOT/publish/scripts/apply-overrides.sh" "$PAYLOAD" "$ROOT/winbuild/overrides/quick-browser"
 
 # WinShell NSIS plug-in (shortcut AUMID), pinned in windows-pin.txt
 WINSHELL="$ROOT/winbuild/tools/WinShell/Plugins/x86-unicode"
