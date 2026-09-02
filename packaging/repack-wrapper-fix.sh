@@ -23,6 +23,12 @@
 # WHAT IS OWED: the next full engine build regenerates this package from
 # source with packaging/build-deb.sh (whose wrapper heredoc carries the same
 # flag, so the fix persists). Do not treat -6 in dist/ as evidence a build ran.
+#
+# -9 (2026-09-02) is the same kind of repack of -8: the wrapper gains
+# `export CHROME_DESKTOP=quick-browser.desktop`, so the engine's Unity
+# LauncherEntry download progress is published under the pinned entry's own id
+# and Quick OS's Activity bar can draw it (Quick OS 0.6.9 item 5). Binaries are
+# byte-for-byte -8.
 # ---------------------------------------------------------------------------
 #
 # The script REFUSES to produce a deb if anything other than the wrapper and
@@ -48,6 +54,8 @@ sed -n "/^cat > \"\$STAGE\/usr\/bin\/quick-browser\" <<'WRAP'$/,/^WRAP$/p" \
   "$HERE/build-deb.sh" | sed '1d;$d' > "$SRC_WRAP"
 grep -q -- '--no-first-run' "$SRC_WRAP" \
   || { echo "extracted wrapper lacks --no-first-run — heredoc anchor drifted?" >&2; exit 1; }
+grep -q '^export CHROME_DESKTOP=quick-browser.desktop$' "$SRC_WRAP" \
+  || { echo "extracted wrapper lacks CHROME_DESKTOP=quick-browser.desktop (0.6.9 download progress)" >&2; exit 1; }
 head -1 "$SRC_WRAP" | grep -q '^#!/bin/sh$' \
   || { echo "extracted wrapper does not start with a shebang — bad extraction" >&2; exit 1; }
 

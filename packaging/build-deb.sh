@@ -150,6 +150,19 @@ export CHROME_DEVEL_SANDBOX=/opt/quick-browser/chrome-sandbox
 # into the engine, so until a from-source branding pass replaces it, the
 # correct move is to never show it. The flag only skips first-run UI; it
 # changes no defaults and the sentinel is still written.
+#
+# CHROME_DESKTOP: a Chromium-branded build tells the desktop's launcher API
+# that it is "chromium-browser.desktop" unless this variable says otherwise
+# (chrome/common/channel_info_posix.cc GetDesktopName). The download
+# progress/count the engine publishes over the Unity LauncherEntry D-Bus API
+# (download_status_updater_linux.cc -- active under KDE, through libunity) is
+# keyed on that id, and Plasma's task manager only shows it on the pinned entry
+# whose FILE NAME matches. With the default id the Activity bar never saw a
+# Quick Browser download (Quick OS 0.6.9 item 5; dbus-monitor on gharbar,
+# 2026-09-02: application://chromium-browser.desktop, unmatched -> with this
+# export application://quick-browser.desktop, progress drawn). Must equal the
+# desktop file name shipped below.
+export CHROME_DESKTOP=quick-browser.desktop
 exec /opt/quick-browser/chrome --class=quick-browser --no-first-run "$@"
 WRAP
 chmod 0755 "$STAGE/usr/bin/quick-browser"
