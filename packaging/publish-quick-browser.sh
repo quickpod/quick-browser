@@ -51,20 +51,20 @@ if [ ! -d .git ]; then git init -q -b main; fi
 git add -A
 git -c user.name="QuickOpen" -c user.email="help@quickpod.io" \
     commit -q -m "$NAME $VER — Chromium + ungoogled-chromium, built by QuickOpen" || true
-if ! gh repo view "quickpod/$SLUG" >/dev/null 2>&1; then
-  gh repo create "quickpod/$SLUG" --public --source . --remote origin \
+if ! gh repo view "quick-open/$SLUG" >/dev/null 2>&1; then
+  gh repo create "quick-open/$SLUG" --public --source . --remote origin \
     --description "A fast web browser with the Google removed. 100% AI-built, published on QuickOpen." --push
 else
-  git remote get-url origin >/dev/null 2>&1 || git remote add origin "https://github.com/quickpod/$SLUG.git"
+  git remote get-url origin >/dev/null 2>&1 || git remote add origin "https://github.com/quick-open/$SLUG.git"
   git push -q origin main || true
 fi
 
 NOTES="Quick OS / Linux: double-click the .usi one-click installer (CMS-signed, verified against the QuickOpen Root CA), or \`apt install quickopen-quick-browser\` from the AIQuick repository.
 
 Built from Chromium $VER with the ungoogled-chromium patch set. Free codecs only (VP8/VP9/AV1/Opus) — H.264/AAC are patent-encumbered and deliberately absent. Not Google Chrome, not Chromium; neither produced nor endorsed by Google. Engine licence: BSD-3-Clause."
-gh release view "$TAG" --repo "quickpod/$SLUG" >/dev/null 2>&1 \
-  && gh release upload "$TAG" "$USI" "$DEB" --repo "quickpod/$SLUG" --clobber >/dev/null \
-  || gh release create "$TAG" "$USI" "$DEB" --repo "quickpod/$SLUG" \
+gh release view "$TAG" --repo "quick-open/$SLUG" >/dev/null 2>&1 \
+  && gh release upload "$TAG" "$USI" "$DEB" --repo "quick-open/$SLUG" --clobber >/dev/null \
+  || gh release create "$TAG" "$USI" "$DEB" --repo "quick-open/$SLUG" \
        --title "$NAME $VER" --notes "$NOTES" >/dev/null
 echo "   github release ok"
 
@@ -106,9 +106,9 @@ import json
 m = json.load(open('$REPO/.quickopen.json'))
 print(json.dumps({'slug': m['slug'], 'name': m['name'], 'tagline': m['tagline'],
   'description': m['description'], 'categorySlug': m['categorySlug'],
-  'license': m['license'], 'githubOwner': 'quickpod', 'githubRepo': m['slug'],
+  'license': m['license'], 'githubOwner': 'quick-open', 'githubRepo': m['slug'],
   'defaultBranch': 'main',
-  'website': 'https://github.com/quickpod/' + m['slug'],
+  'website': 'https://github.com/quick-open/' + m['slug'],
   'aiStack': m['aiStack']}))")"
 curl -s -X POST $API/update/admin/projects -H "Authorization: Bearer $AT" \
      -H 'Content-Type: application/json' -d "$PAYLOAD" >/dev/null
